@@ -11,12 +11,16 @@ import { LoadingSpinner } from '@ui/components/LoadingSpinner';
 import { useWallpaper } from '../../../apps/settings/hooks/useWallpaper';
 import { styled } from '@mui/styles';
 
+// iOS 18 style glassmorphism call overlay
 const StyledBoxRoot: React.FC<BoxProps> = styled(Box)({
   height: '100%',
-  backdropFilter: 'blur(20px) brightness(0.6)',
+  background: 'linear-gradient(180deg, rgba(20,20,25,0.75) 0%, rgba(15,15,20,0.92) 100%)',
+  backdropFilter: 'blur(40px) saturate(180%)',
+  WebkitBackdropFilter: 'blur(40px) saturate(180%)',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
+  alignItems: 'center',
 });
 
 export const CallModal: React.FC = () => {

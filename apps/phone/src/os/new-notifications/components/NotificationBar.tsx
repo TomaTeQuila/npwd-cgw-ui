@@ -1,21 +1,16 @@
 import React, { useEffect } from 'react';
 import {
   Typography,
-  Grid,
   IconButton,
   Slide,
   Paper,
   Box,
   List,
   Divider,
-  GridProps,
   Button,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import SignalIcon from '@mui/icons-material/SignalCellular3Bar';
-import Battery90Icon from '@mui/icons-material/Battery90';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import Default from '../../../config/default.json';
 import { NotificationItem } from './NotificationItem';
 import usePhoneTime from '../../phone/hooks/usePhoneTime';
 import { NoNotificationText } from './NoNotificationText';
@@ -29,86 +24,38 @@ import { useRecoilValue } from 'recoil';
 import { useApp } from '@os/apps/hooks/useApps';
 import { UnreadNotificationBarProps } from '@typings/notifications';
 import { useNotification } from '../useNotification';
-import {BatteryFull, SignalMedium} from "lucide-react";
-import {cn} from "@utils/css";
+import { BatteryFull, Signal, Wifi } from 'lucide-react';
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    backgroundColor: theme.palette.background.default,
-    height: '30px',
-    width: '100%',
-    color: theme.palette.text.primary,
-    zIndex: 99,
-    paddingLeft: '15px',
-    paddingRight: '15px',
-    position: 'relative',
-    '&:hover': {
-      cursor: 'pointer',
-    },
-  },
-  item: {
-    margin: '0 6px',
-  },
-  text: {
-    position: 'relative',
-    lineHeight: '30px',
-    color: theme.palette.text.primary,
-  },
-  icon: {
-    padding: '4px',
-    color: theme.palette.text.primary,
-  },
   drawer: {
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: 'rgba(30, 30, 30, 0.95)',
+    backdropFilter: 'blur(20px)',
     width: '100%',
     position: 'absolute',
-    top: '30px',
+    top: '44px',
     zIndex: 98,
-  },
-  closeNotifBtn: {
-    position: 'absolute',
-    right: '8px',
-    top: '8px',
-  },
-  notificationItem: {
-    position: 'relative',
+    borderRadius: '0 0 16px 16px',
   },
   collapseBtn: {
     margin: '0 auto',
   },
 }));
 
-interface WrapperGridProps extends GridProps {
-  tgtNoti?: UnreadNotificationBarProps;
-  key: string | number;
+interface IconUnreadGridProps {
+  tgtNoti: UnreadNotificationBarProps;
 }
 
-const IconUnreadGrid: React.FC<WrapperGridProps> = ({ tgtNoti }) => {
+const IconUnreadItem: React.FC<IconUnreadGridProps> = ({ tgtNoti }) => {
   const notificationTgtApp = useApp(tgtNoti.appId);
-
   return (
-    <Grid
-      item
-      key={tgtNoti.id}
-      component={IconButton}
-      sx={{
-        color: 'text.primary',
-        fontSize: 'small',
-      }}
-    >
-      {notificationTgtApp.notificationIcon}
-    </Grid>
+    <div className="mx-0.5">
+      {notificationTgtApp?.notificationIcon}
+    </div>
   );
 };
 
-interface UnreadNotificationListItemProps {
-  tgtNotiId: string;
-  key: string | number;
-}
-
-const UnreadNotificationListItem: React.FC<UnreadNotificationListItemProps> = ({ tgtNotiId }) => {
+const UnreadNotificationListItem: React.FC<{ tgtNotiId: string }> = ({ tgtNotiId }) => {
   const notiContents = useRecoilValue(notifications(tgtNotiId));
-
   return <NotificationItem key={tgtNotiId} {...notiContents} />;
 };
 
@@ -116,11 +63,8 @@ export const NotificationBar = () => {
   const classes = useStyles();
   const time = usePhoneTime();
   const [barCollapsed, setBarUncollapsed] = useNavbarUncollapsed();
-
   const unreadNotificationIds = useUnreadNotificationIds();
-
   const unreadNotifications = useUnreadNotifications();
-
   const { markAllAsRead } = useNotification();
 
   const handleClearNotis = async () => {
@@ -136,43 +80,83 @@ export const NotificationBar = () => {
 
   return (
     <>
+      {/* iOS-style Status Bar - Transparent with Dynamic Island feel */}
       <div
-        className={cn(classes.root, "flex items-center justify-between flex-nowrap")}
-        onClick={() => {
-          setBarUncollapsed((curr) => !curr);
+        className="w-full flex items-center justify-between px-6 cursor-pointer"
+        style={{
+          height: '44px',
+          background: 'transparent',
         }}
+        onClick={() => setBarUncollapsed((curr) => !curr)}
       >
-        <Grid container item wrap="nowrap">
+        {/* Left side - Notification icons */}
+        <div className="flex items-center min-w-[80px]">
           {unreadNotifications &&
             unreadNotifications
               .filter((val, idx, self) => idx === self.findIndex((t) => t.appId === val.appId))
-              .map((notification, idx) => {
-                return <IconUnreadGrid tgtNoti={notification} key={idx} />;
-              })}
-        </Grid>
-        {time && (
-          <Grid item className={classes.item}>
-            <Typography className={classes.text} variant="button">
+              .slice(0, 4)
+              .map((notification, idx) => (
+                <IconUnreadItem tgtNoti={notification} key={idx} />
+              ))}
+        </div>
+
+        {/* Center - Time (iOS style) */}
+        <div className="flex-1 flex justify-center">
+          {time && (
+            <Typography
+              sx={{
+                fontSize: '15px',
+                fontWeight: 600,
+                color: 'white',
+                letterSpacing: '-0.3px',
+                textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+              }}
+            >
               {time}
             </Typography>
-          </Grid>
-        )}
-        <div className="flex items-center justify-end">
-          <div>
-            <SignalMedium />
-          </div>
-          <div className="mt-1.5 text-green-300">
-            <BatteryFull />
+          )}
+        </div>
+
+        {/* Right side - Signal, WiFi, Battery */}
+        <div className="flex items-center gap-1 min-w-[80px] justify-end">
+          <Signal
+            size={14}
+            className="text-white"
+            style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+          />
+          <Wifi
+            size={14}
+            className="text-white"
+            style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+          />
+          <div className="flex items-center">
+            <span
+              className="text-white text-xs mr-0.5"
+              style={{
+                fontSize: '11px',
+                fontWeight: 500,
+                textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+              }}
+            >
+              100%
+            </span>
+            <BatteryFull
+              size={20}
+              className="text-green-400"
+              style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+            />
           </div>
         </div>
       </div>
+
+      {/* Notification dropdown */}
       <Slide direction="down" in={barCollapsed} mountOnEnter unmountOnExit>
         <Paper square className={classes.drawer}>
           <Box py={1}>
             {unreadNotificationIds?.length !== 0 && (
               <Box pl={2}>
                 <Button color="primary" size="small" onClick={handleClearNotis}>
-                  Clear all notification
+                  Clear all
                 </Button>
               </Box>
             )}
@@ -193,7 +177,7 @@ export const NotificationBar = () => {
               size="small"
               onClick={() => setBarUncollapsed(false)}
             >
-              <ArrowDropUpIcon />
+              <ArrowDropUpIcon sx={{ color: 'white' }} />
             </IconButton>
           </Box>
         </Paper>

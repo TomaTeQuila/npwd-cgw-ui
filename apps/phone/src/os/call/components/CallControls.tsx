@@ -3,109 +3,156 @@ import CallIcon from '@mui/icons-material/Call';
 import CallEndIcon from '@mui/icons-material/CallEnd';
 import { useCall } from '../hooks/useCall';
 import { useCallModal } from '../hooks/useCallModal';
-import { StatusIconButton } from '@ui/components/StatusIconButton';
-import { Box } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { Box, IconButton } from '@mui/material';
 import { useHistory } from 'react-router-dom';
 import MutedIcon from '@mui/icons-material/VolumeOff';
 import UnmutedIcon from '@mui/icons-material/VolumeUp';
 
-const useStyles = makeStyles({
-  icon: {
-    color: 'white',
-    boxShadow: '0 .5rem 3rem -.25em rgba(0,0,0,.3)',
-  },
-  iconWrapper: {
-    height: 60,
-    width: 60,
-  },
-  smallIconWrapper: {
-    height: 40,
-    width: 40,
-  },
-});
+// iOS-style call button component
+interface CallButtonProps {
+  color: 'accept' | 'decline' | 'muted' | 'unmuted';
+  onClick: (e: React.MouseEvent) => void;
+  children: React.ReactNode;
+  size?: 'small' | 'medium';
+}
+
+const CallButton: React.FC<CallButtonProps> = ({ color, onClick, children, size = 'medium' }) => {
+  const getBackgroundColor = () => {
+    switch (color) {
+      case 'accept':
+        return '#34C759'; // iOS green
+      case 'decline':
+        return '#FF3B30'; // iOS red
+      case 'muted':
+        return '#FF3B30'; // iOS red for muted
+      case 'unmuted':
+        return 'rgba(255,255,255,0.2)'; // Glass effect for unmuted
+      default:
+        return 'rgba(255,255,255,0.2)';
+    }
+  };
+
+  const dimensions = size === 'small' ? { width: 50, height: 50 } : { width: 70, height: 70 };
+  const iconSize = size === 'small' ? 24 : 32;
+
+  return (
+    <IconButton
+      onClick={onClick}
+      sx={{
+        ...dimensions,
+        backgroundColor: getBackgroundColor(),
+        color: 'white',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+        transition: 'all 0.15s ease',
+        '&:hover': {
+          backgroundColor: getBackgroundColor(),
+          transform: 'scale(1.05)',
+        },
+        '&:active': {
+          transform: 'scale(0.95)',
+        },
+        '& svg': {
+          fontSize: iconSize,
+        },
+      }}
+    >
+      {children}
+    </IconButton>
+  );
+};
 
 export const CallControls = ({ isSmall }: { isSmall?: boolean }) => {
-  const classes = useStyles();
   const history = useHistory();
   const { setModal } = useCallModal();
   const { call, endCall, acceptCall, rejectCall, muteCall } = useCall();
   const [muted, setMuted] = useState(false);
 
-  const handleAcceptCall = (e) => {
+  const handleAcceptCall = (e: React.MouseEvent) => {
     e.stopPropagation();
     history.push('/call');
     acceptCall();
   };
 
-  const handleRejectCall = (e) => {
+  const handleRejectCall = (e: React.MouseEvent) => {
     e.stopPropagation();
     setModal(false);
     rejectCall();
   };
 
-  const handleEndCall = (e) => {
+  const handleEndCall = (e: React.MouseEvent) => {
     e.stopPropagation();
     setModal(false);
     endCall();
   };
 
-  // We display only the hang up if the call is accepted
-  // or we are the one calling
-  if (call?.is_accepted || call?.isTransmitter)
+  const handleMuteToggle = () => {
+    setMuted((state) => !state);
+    muteCall(!muted);
+  };
+
+  const buttonSize = isSmall ? 'small' : 'medium';
+
+  // Display end call and mute controls for accepted/outgoing calls
+  if (call?.is_accepted || call?.isTransmitter) {
     return (
       <Box
         display="flex"
-        justifyContent={call?.is_accepted ? 'space-between' : 'center'}
+        justifyContent={call?.is_accepted ? 'center' : 'center'}
+        alignItems="center"
+        gap={4}
         px={2}
-        my={2}
+        py={3}
       >
-        <StatusIconButton
-          color="error"
-          size={isSmall ? 'small' : 'medium'}
+        {/* End call button */}
+        <CallButton
+          color="decline"
+          size={buttonSize}
           onClick={handleEndCall}
-          className={isSmall ? classes.smallIconWrapper : classes.iconWrapper}
         >
-          <CallEndIcon className={classes.icon} />
-        </StatusIconButton>
+          <CallEndIcon />
+        </CallButton>
+
+        {/* Mute button - only show when call is connected */}
         {call?.is_accepted && (
-          <StatusIconButton
-            color={muted ? 'error' : 'success'}
-            size={isSmall ? 'small' : 'medium'}
-            onClick={() => {
-              setMuted((state) => !state);
-              muteCall(!muted);
-            }}
-            className={isSmall ? classes.smallIconWrapper : classes.iconWrapper}
+          <CallButton
+            color={muted ? 'muted' : 'unmuted'}
+            size={buttonSize}
+            onClick={handleMuteToggle}
           >
-            {muted ? (
-              <MutedIcon className={classes.icon} />
-            ) : (
-              <UnmutedIcon className={classes.icon} />
-            )}
-          </StatusIconButton>
+            {muted ? <MutedIcon /> : <UnmutedIcon />}
+          </CallButton>
         )}
       </Box>
     );
+  }
 
+  // Display accept/reject buttons for incoming calls
   return (
-    <Box display="flex" alignItems="center" justifyContent="space-between" px={2} my={2}>
-      <StatusIconButton
-        color="error"
-        size={isSmall ? 'small' : 'medium'}
+    <Box
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      gap={6}
+      px={2}
+      py={3}
+    >
+      {/* Decline button */}
+      <CallButton
+        color="decline"
+        size={buttonSize}
         onClick={handleRejectCall}
-        className={isSmall ? classes.smallIconWrapper : classes.iconWrapper}
       >
-        <CallEndIcon className={classes.icon} />
-      </StatusIconButton>
-      <StatusIconButton
-        color="success"
-        size={isSmall ? 'small' : 'medium'}
+        <CallEndIcon />
+      </CallButton>
+
+      {/* Accept button */}
+      <CallButton
+        color="accept"
+        size={buttonSize}
         onClick={handleAcceptCall}
-        className={isSmall ? classes.smallIconWrapper : classes.iconWrapper}
       >
-        <CallIcon className={classes.icon} />
-      </StatusIconButton>
+        <CallIcon />
+      </CallButton>
     </Box>
   );
 };

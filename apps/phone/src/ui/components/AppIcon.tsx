@@ -1,46 +1,8 @@
 import React from 'react';
-import { darken, Theme } from '@mui/material/styles';
-import makeStyles from '@mui/styles/makeStyles';
-import { green } from '@mui/material/colors';
-import { Badge, Button, Zoom } from '@mui/material';
+import { darken } from '@mui/material/styles';
+import { Badge, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { INotificationIcon } from '@os/notifications/providers/NotificationsProvider';
-import { Tooltip } from './Tooltip';
-
-const useStyles = makeStyles<Theme, { color: string; backgroundColor: string }>((theme) => ({
-  root: {
-    padding: 0,
-    background: 'transparent',
-    marginTop: theme.spacing(3),
-  },
-  avatar: {
-    '&:hover': {
-      background: ({ backgroundColor }) => {
-        return `linear-gradient(45deg, ${darken(backgroundColor, 0.25)} 10%, ${backgroundColor} 90%)`;
-      },
-    },
-    background: ({ backgroundColor }) => {
-      return `linear-gradient(45deg, ${darken(backgroundColor, 0.2)} 20%, ${backgroundColor} 90%)`;
-    },
-    color: ({ color }) => color,
-    boxShadow: theme.shadows[2],
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 18,
-    width: theme.spacing(8),
-    height: theme.spacing(8),
-    fontSize: theme.typography.h4.fontSize,
-  },
-  icon: {
-    fontSize: theme.typography.h4.fontSize,
-    width: theme.spacing(8),
-    height: theme.spacing(8),
-  },
-  tooltip: {
-    fontSize: 12,
-  },
-}));
 
 export interface AppIconProps {
   id: string;
@@ -62,24 +24,76 @@ export const AppIcon: React.FC<AppIconProps> = ({
   notification,
 }) => {
   const [t] = useTranslation();
-  const classes = useStyles({
-    backgroundColor: backgroundColor || green[50],
-    color: color || green[400],
-  });
+
+  // iOS squircle style
+  const iconContainerStyle: React.CSSProperties = {
+    width: '60px',
+    height: '60px',
+    borderRadius: '22%', // iOS squircle
+    background: `linear-gradient(145deg, ${backgroundColor} 0%, ${darken(backgroundColor, 0.15)} 100%)`,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.1)',
+    color: color,
+    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+  };
+
+  const iconStyle: React.CSSProperties = {
+    fontSize: '28px',
+    width: '28px',
+    height: '28px',
+    color: color,
+  };
 
   return (
-    <button className={classes.root}>
+    <div
+      className="flex flex-col items-center gap-1 py-2 cursor-pointer group"
+      style={{ minWidth: '70px' }}
+    >
       <Badge
         color="error"
         badgeContent={notification?.badge}
-        invisible={!notification || notification.badge < 2}
+        invisible={!notification || notification.badge < 1}
+        sx={{
+          '& .MuiBadge-badge': {
+            fontSize: '11px',
+            minWidth: '18px',
+            height: '18px',
+            borderRadius: '9px',
+          }
+        }}
       >
-        {Icon ? (
-          <Icon className={classes.icon} fontSize="large" />
-        ) : (
-          <div className={classes.avatar}>{icon || t(nameLocale)}</div>
-        )}
+        <div
+          style={iconContainerStyle}
+          className="group-hover:scale-105 group-active:scale-95"
+        >
+          {Icon ? (
+            <Icon style={iconStyle} />
+          ) : (
+            <div style={iconStyle}>{icon}</div>
+          )}
+        </div>
       </Badge>
-    </button>
+
+      {/* App name label - iOS style */}
+      <Typography
+        variant="caption"
+        sx={{
+          fontSize: '10px',
+          fontWeight: 500,
+          color: 'white',
+          textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
+          maxWidth: '68px',
+          textAlign: 'center',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          lineHeight: 1.2,
+        }}
+      >
+        {t(nameLocale)}
+      </Typography>
+    </div>
   );
 };

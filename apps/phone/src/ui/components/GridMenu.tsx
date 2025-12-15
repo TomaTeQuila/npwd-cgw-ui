@@ -1,33 +1,43 @@
 import React, { Fragment } from 'react';
 import { AppIcon } from './AppIcon';
-import { Box, Grid, GridSize } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { IApp } from '@os/apps/config/apps';
 
 interface GridMenuProps {
   items: IApp[];
   Component?: React.ElementType;
-  xs?: GridSize;
+  columns?: number;
 }
 
-export const GridMenu: React.FC<GridMenuProps> = ({ items, Component = AppIcon, xs }) => {
+export const GridMenu: React.FC<GridMenuProps> = ({
+  items,
+  Component = AppIcon,
+  columns = 4  // iOS default: 4 columns
+}) => {
   return (
-    <Grid container alignItems="center" direction="row">
+    <div
+      className="grid gap-y-2"
+      style={{
+        gridTemplateColumns: `repeat(${columns}, 1fr)`,
+        justifyItems: 'center',
+        padding: '0 8px',
+      }}
+    >
       {items &&
         items.length &&
         items.map((item) => (
           <Fragment key={item.id}>
             {!item.isDisabled && (
-              <Grid item xs={xs} key={item.id}>
-                <Box textAlign="center">
-                  <Link to={item.path}>
-                    <Component {...item} />
-                  </Link>
-                </Box>
-              </Grid>
+              <Link
+                to={item.path}
+                className="no-underline"
+                style={{ textDecoration: 'none' }}
+              >
+                <Component {...item} />
+              </Link>
             )}
           </Fragment>
         ))}
-    </Grid>
+    </div>
   );
 };

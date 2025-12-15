@@ -4,6 +4,9 @@ import { useContactActions } from '../../../apps/contacts/hooks/useContactAction
 import { useCall } from '../hooks/useCall';
 import { useTranslation } from 'react-i18next';
 
+// Default avatar for contacts without photos
+const DEFAULT_AVATAR = 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y&s=256';
+
 const CallContactContainer = () => {
   const [t] = useTranslation();
   const { call } = useCall();
@@ -14,30 +17,67 @@ const CallContactContainer = () => {
     call.isTransmitter
       ? getDisplayByNumber(call?.receiver)
       : !call.isTransmitter && call.isAnonymous
-      ? 'Anonymous'
-      : getDisplayByNumber(call?.transmitter);
+        ? 'Anonymous'
+        : getDisplayByNumber(call?.transmitter);
+
+  const getAvatarUrl = () => {
+    if (call.isTransmitter) {
+      return getPictureByNumber(call.receiver) || DEFAULT_AVATAR;
+    }
+    if (!call.isTransmitter && call.isAnonymous) {
+      return DEFAULT_AVATAR;
+    }
+    return getPictureByNumber(call?.transmitter) || DEFAULT_AVATAR;
+  };
 
   return (
-    <Box display="flex" alignItems="center">
-      <Box flexGrow={1} overflow="hidden" textOverflow="ellipsis">
-        <Typography variant="body1">
-          {call.isTransmitter
-            ? t('CALLS.MESSAGES.OUTGOING').toUpperCase()
-            : t('CALLS.MESSAGES.INCOMING').toUpperCase()}
-        </Typography>
-        <Typography variant="h4">{getDisplayOrNumber()}</Typography>
-      </Box>
+    // iOS-style centered contact display
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      textAlign="center"
+      pt={4}
+    >
+      {/* Large centered avatar with subtle shadow */}
       <Avatar
-        sx={{ ml: 1, height: 80, width: 80 }}
+        sx={{
+          height: 100,
+          width: 100,
+          mb: 2,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+          border: '2px solid rgba(255,255,255,0.1)',
+        }}
         alt={getDisplayOrNumber()}
-        src={
-          call.isTransmitter
-            ? getPictureByNumber(call.receiver)
-            : !call.isTransmitter && call.isAnonymous
-            ? 'https://i.fivemanage.com/images/3ClWwmpwkFhL.png'
-            : getPictureByNumber(call?.transmitter)
-        }
+        src={getAvatarUrl()}
       />
+
+      {/* Call type label */}
+      <Typography
+        variant="caption"
+        sx={{
+          color: 'rgba(255,255,255,0.6)',
+          letterSpacing: 1,
+          textTransform: 'uppercase',
+          mb: 0.5,
+        }}
+      >
+        {call.isTransmitter
+          ? t('CALLS.MESSAGES.OUTGOING')
+          : t('CALLS.MESSAGES.INCOMING')}
+      </Typography>
+
+      {/* Contact name - prominent display */}
+      <Typography
+        variant="h4"
+        sx={{
+          color: 'white',
+          fontWeight: 500,
+          letterSpacing: '-0.5px',
+        }}
+      >
+        {getDisplayOrNumber()}
+      </Typography>
     </Box>
   );
 };

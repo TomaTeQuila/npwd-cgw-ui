@@ -37,7 +37,8 @@ interface IProps {
   profile: FormattedProfile | FormattedMatch;
 }
 
-const DEFAULT_IMAGE = 'https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg';
+// Default gray circular avatar with person silhouette (iOS style)
+const DEFAULT_IMAGE = 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y&s=256';
 
 const Profile = ({ profile }: IProps) => {
   const c = useStyles();

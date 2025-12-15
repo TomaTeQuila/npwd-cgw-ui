@@ -1,6 +1,7 @@
 import { Tweet } from '@typings/twitter';
 
-export const IMG_DEFAULT_AVATAR = 'https://i.file.glass/QrEvq.png';
+// Default gray circular avatar with person silhouette (iOS style)
+export const IMG_DEFAULT_AVATAR = 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y&s=256';
 export const IMG_INVALID_AVATAR = 'media/twitter/invalid.png';
 export const APP_TWITTER = 'TWITTER';
 
