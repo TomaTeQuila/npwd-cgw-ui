@@ -6,6 +6,7 @@ import { MarketplaceListing } from '@typings/marketplace';
 import { ListingActions } from './ListingActions';
 import { PictureReveal } from '@ui/components/PictureReveal';
 import { useTranslation } from 'react-i18next';
+import { ImageOff } from 'lucide-react';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,42 +42,76 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const MarketplaceItem: React.FC<MarketplaceListing> = ({ children, ...listing }) => {
+export const MarketplaceItem: React.FC<MarketplaceListing> = (listing) => {
   const classes = useStyles();
   const [t] = useTranslation();
 
   return (
     <ListItem className={classes.root}>
       <div className="flex w-full flex-col">
-        <div className="mb-4 flex h-auto flex-col overflow-auto rounded border dark:border-neutral-800 dark:bg-neutral-900">
-          <div style={{ margin: 10 }}>
-            <h2 style={{ margin: 5 }} className="text-sm dark:text-neutral-50">
-              {listing.name}
-            </h2>
-            <p style={{ padding: 5 }} className="text-base font-medium text-neutral-400">
-              {listing.title}
-            </p>
+        {/* Modern card with dark purple theme and glow */}
+        <div
+          className="mb-4 flex h-auto flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.01]"
+          style={{
+            background: 'linear-gradient(135deg, rgba(40, 30, 60, 0.9) 0%, rgba(25, 20, 35, 0.95) 100%)',
+            border: '1px solid rgba(139, 92, 246, 0.2)',
+            boxShadow: '0 4px 20px rgba(139, 92, 246, 0.1)',
+          }}
+        >
+          {/* Header with name and price */}
+          <div className="flex items-center justify-between p-4">
+            <div>
+              <h2 className="text-sm font-medium text-violet-300">
+                {listing.name}
+              </h2>
+              <p className="text-base font-semibold text-white">
+                {listing.title}
+              </p>
+            </div>
+            {/* Price badge */}
+            {listing.price && (
+              <div
+                className="rounded-full px-3 py-1"
+                style={{
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                  boxShadow: '0 2px 12px rgba(139, 92, 246, 0.5)',
+                }}
+              >
+                <span className="text-sm font-semibold text-white">
+                  $ {listing.price}
+                </span>
+              </div>
+            )}
           </div>
 
+          {/* Image or placeholder */}
           {listing.url ? (
             <PictureReveal>
               <PictureResponsive src={listing.url} alt={`${listing.name}`} />
             </PictureReveal>
           ) : (
-            <p className="p-4 text-sm dark:text-red-400">
-              {t('MARKETPLACE.NO_IMAGE')}
-              <span role="img" aria-label="emoji">
-                :(
-              </span>
-            </p>
+            <div
+              className="flex items-center justify-center py-8"
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+              }}
+            >
+              <div className="flex flex-col items-center gap-2 text-neutral-500">
+                <ImageOff size={32} strokeWidth={1.5} />
+                <span className="text-xs">{String(t('MARKETPLACE.NO_IMAGE'))}</span>
+              </div>
+            </div>
           )}
 
-          <p className="max-w-full break-words p-4 text-sm dark:text-neutral-50">
+          {/* Description */}
+          <p className="max-w-full break-words px-4 py-3 text-sm text-neutral-300">
             {listing.description}
           </p>
+
           <ListingActions {...listing} />
         </div>
       </div>
     </ListItem>
   );
 };
+

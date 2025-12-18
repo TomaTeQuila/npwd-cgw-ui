@@ -16,7 +16,7 @@ export class _MarketplaceDB {
     listing: MarketplaceListingBase,
   ): Promise<number> {
     const query =
-      'INSERT INTO npwd_marketplace_listings (identifier, username, name, number, title, url, description) VALUES (?, ?, ?, ?, ?, ?, ?)';
+      'INSERT INTO npwd_marketplace_listings (identifier, username, name, number, title, url, description, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 
     const [result] = await DbInterface._rawExec(query, [
       identifier,
@@ -26,6 +26,7 @@ export class _MarketplaceDB {
       listing.title,
       listing.url,
       listing.description,
+      listing.price || null,
     ]);
 
     const resultCast = result as ResultSetHeader;

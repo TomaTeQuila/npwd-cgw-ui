@@ -2,6 +2,12 @@ import React from 'react';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { usePhone } from '@os/phone/hooks/usePhone';
 
+/**
+ * FiveOS Home Indicator
+ * 
+ * Barra minimalista estilo iOS - sin fondo, solo la barra gris.
+ * Un click/tap navega al home, doble click cierra el teléfono.
+ */
 export const Navigation: React.FC = () => {
   const history = useHistory();
   const { isExact } = useRouteMatch('/');
@@ -17,31 +23,37 @@ export const Navigation: React.FC = () => {
     }
   };
 
-  const handleSwipeUp = () => {
-    // Future: could add swipe gesture detection
-    handleGoToMenu();
-  };
-
   return (
-    // iOS-style home indicator - minimal, clean, modern
     <div
-      className="w-full flex items-end justify-center pb-2 pt-1"
+      className="fiveos-home-indicator"
       style={{
-        background: 'transparent',
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
         height: '28px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'transparent',
+        zIndex: 200,
       }}
     >
+      {/* The indicator bar - minimal, clean */}
       <div
-        onClick={handleSwipeUp}
-        onDoubleClick={() => history.push('/')}
-        className="cursor-pointer transition-all duration-200 hover:opacity-80 active:scale-95"
+        onClick={handleGoToMenu}
+        onDoubleClick={() => closePhone()}
         style={{
           width: '134px',
           height: '5px',
-          backgroundColor: 'rgba(255, 255, 255, 0.5)',
+          backgroundColor: 'rgba(255, 255, 255, 0.45)',
           borderRadius: '100px',
+          cursor: 'pointer',
+          transition: 'all 200ms ease',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
         }}
-        title={isExact ? 'Close phone' : 'Go to home'}
+        className="hover:opacity-80 active:scale-95 active:opacity-60"
+        title={isExact ? 'Cerrar teléfono' : 'Ir al inicio'}
       />
     </div>
   );

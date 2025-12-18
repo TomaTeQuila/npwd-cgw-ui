@@ -117,6 +117,7 @@ CREATE TABLE IF NOT EXISTS `npwd_marketplace_listings`
     `title`       varchar(255)          DEFAULT NULL,
     `url`         varchar(255)          DEFAULT NULL,
     `description` varchar(255) NOT NULL,
+    `price`       varchar(50)           DEFAULT NULL,
     `createdAt`   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updatedAt`   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `reported`    tinyint      NOT NULL DEFAULT 0,

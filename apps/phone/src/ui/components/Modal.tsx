@@ -1,39 +1,7 @@
 import React from 'react';
-import CloseIcon from '@mui/icons-material/Close';
-import makeStyles from '@mui/styles/makeStyles';
-import { Button, Paper, useTheme } from '@mui/material';
+import { X } from 'lucide-react';
 import * as DialogRadix from '@radix-ui/react-dialog';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    padding: '24px',
-    zIndex: 10,
-    marginTop: '15px',
-    width: '90%',
-    display: 'flex',
-    flexFlow: 'column nowrap',
-    position: 'absolute',
-    top: '80px',
-  },
-  displayBlock: {
-    /*Sets modal to center*/
-    display: 'flex',
-    flexFlow: 'column nowrap',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  displayNone: {
-    display: 'none',
-  },
-  imageModalCloseButton: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    width: '10%',
-    color: theme.palette.text.primary,
-  },
-}));
+import { fiveosTheme } from '../../styles/fiveos.theme';
 
 interface ModalProps {
   children: React.ReactNode;
@@ -41,30 +9,109 @@ interface ModalProps {
   handleClose?: () => void;
 }
 
+/**
+ * FiveOS Modal - Legacy version
+ * Uses Paper-based modal with glass styling
+ */
 export const Modal: React.FC<ModalProps> = ({ children, visible, handleClose }) => {
-  const phoneTheme = useTheme();
-  const classes = useStyles(phoneTheme);
-
-  const showHideClassName = visible ? classes.displayBlock : classes.displayNone;
+  if (!visible) return null;
 
   return (
-    <div className={showHideClassName}>
-      <Paper className={classes.root}>
-        <Button onClick={handleClose} className={classes.imageModalCloseButton}>
-          <CloseIcon />
-        </Button>
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 100,
+      }}
+    >
+      {/* Backdrop */}
+      <div
+        onClick={handleClose}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(0, 0, 0, 0.7)',
+        }}
+      />
+
+      {/* Modal content */}
+      <div
+        style={{
+          position: 'relative',
+          width: '90%',
+          maxWidth: '320px',
+          background: 'linear-gradient(180deg, rgba(50, 50, 55, 0.98) 0%, rgba(35, 35, 40, 0.99) 100%)',
+          borderRadius: '16px',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+          padding: '20px',
+          zIndex: 101,
+        }}
+      >
+        {/* Close button */}
+        <button
+          onClick={handleClose}
+          style={{
+            position: 'absolute',
+            top: '12px',
+            right: '12px',
+            background: 'rgba(255, 255, 255, 0.1)',
+            border: 'none',
+            borderRadius: '50%',
+            width: '28px',
+            height: '28px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <X size={16} color="rgba(255, 255, 255, 0.6)" />
+        </button>
+
         {children}
-      </Paper>
+      </div>
     </div>
   );
 };
 
-export const Modal2 = ({ children, visible, handleClose }) => {
+/**
+ * FiveOS Modal2 - Modern Radix-based version
+ * Glass effect with subtle animations
+ */
+export const Modal2: React.FC<ModalProps> = ({ children, visible, handleClose }) => {
   return (
     <DialogRadix.Root open={visible} onOpenChange={handleClose}>
       <DialogRadix.Portal container={document.getElementById('phone')}>
-        <DialogRadix.Overlay className="fixed absolute inset-0 inset-0 bg-black/50" />
-        <DialogRadix.Content className="absolute left-[50%] top-[50%] max-h-[100vh] w-[80vw] max-w-[350px] translate-x-[-50%] translate-y-[-50%]  rounded-[6px] bg-neutral-100 p-[25px] text-neutral-900 dark:bg-neutral-800 dark:text-neutral-50">
+        <DialogRadix.Overlay
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.7)',
+          }}
+        />
+        <DialogRadix.Content
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '85%',
+            maxWidth: '320px',
+            maxHeight: '80vh',
+            background: 'linear-gradient(180deg, rgba(50, 50, 55, 0.98) 0%, rgba(35, 35, 40, 0.99) 100%)',
+            borderRadius: '16px',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+            padding: '20px',
+            color: 'white',
+            fontFamily: fiveosTheme.typography.fontFamily,
+            overflowY: 'auto',
+          }}
+        >
           {children}
         </DialogRadix.Content>
       </DialogRadix.Portal>

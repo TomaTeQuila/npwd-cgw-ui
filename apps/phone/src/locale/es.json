@@ -198,6 +198,7 @@
       "POST_LISTING": "Publicar",
       "FORM_IMAGE": "Imagen o URL",
       "FORM_DESCRIPTION": "Descripción",
+      "FORM_PRICE": "Precio (opcional)",
       "NO_IMAGE": "No se ha proporcionado imagen"
     },
     "MESSAGES": {
@@ -277,10 +278,11 @@
     "APPS_BANK": "Banco",
     "APPS_NOTES": "Notas",
     "APPS_EXAMPLE": "App de ejemplo",
-    "APPS_TWITTER": "Twitter",
-    "APPS_MARKETPLACE": "Anuncios",
+    "APPS_TWITTER": "X",
+    "APPS_MARKETPLACE": "Marketplace",
     "APPS_CAMERA": "Cámara",
     "APPS_MATCH": "Matchmaker",
+    "APPS_DARKCHAT": "Dark Chat",
     "APPS_CALCULATOR_COPIED": "¡Resultado copiado!",
     "GENERIC_CLICK_TO_REVEAL": "Presiona para revelar",
     "GENERIC_LOADING": "Cargando...",

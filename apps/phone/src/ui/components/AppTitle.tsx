@@ -1,30 +1,71 @@
 import React, { HTMLAttributes } from 'react';
-import { Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { IApp } from '@os/apps/config/apps';
-import { OverridableStringUnion } from '@mui/types';
-import { TypographyPropsVariantOverrides } from '@mui/material/Typography/Typography';
-import { Variant } from '@mui/material/styles/createTypography';
+import { useHistory, useRouteMatch } from 'react-router-dom';
+import { BackNavigation } from './BackNavigation';
+import { fiveosTheme } from '../../styles/fiveos.theme';
 
 interface AppTitleProps extends HTMLAttributes<HTMLDivElement> {
   app: IApp;
-  variant?: OverridableStringUnion<Variant | 'inherit', TypographyPropsVariantOverrides>;
+  showBackButton?: boolean;
+  backLabel?: string;
+  backTo?: string;
 }
 
-// Taso: Maybe we should pass an icon (maybe fa?) as a prop as well at somepoint
-// but need to think about the best way to do that for standardization sake.
+/**
+ * FiveOS App Title Header
+ * 
+ * Título grande con tipografía ligera.
+ * Incluye BackNavigation cuando no estamos en la raíz de la app.
+ */
 export const AppTitle: React.FC<AppTitleProps> = ({
-  app: { backgroundColor, color, nameLocale },
-  variant = 'h5',
+  app: { nameLocale, path },
+  showBackButton,
+  backLabel,
+  backTo,
   ...props
 }) => {
   const [t] = useTranslation();
+  const history = useHistory();
+  const isAppRoot = useRouteMatch({ path, exact: true });
+
+  // Show back button if explicitly set, or if we're not at app root
+  const shouldShowBack = showBackButton ?? !isAppRoot;
+
   return (
-    // TODO: Support color and backgroundColor
-    <div className="px-4 py-2 pt-4 bg-neutral-100 dark:bg-neutral-900" {...props}>
-      <h3 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-        {t(nameLocale)}
-      </h3>
+    <div
+      className="fiveos-app-header"
+      style={{
+        padding: '16px 16px 12px 16px',
+        background: 'linear-gradient(180deg, rgba(18, 18, 22, 0.95) 0%, rgba(18, 18, 22, 0.85) 100%)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+      }}
+      {...props}
+    >
+      {/* Back navigation */}
+      {shouldShowBack && (
+        <BackNavigation
+          label={backLabel}
+          to={backTo}
+        />
+      )}
+
+      {/* App title - large, light typography */}
+      <h1
+        style={{
+          margin: shouldShowBack ? '4px 0 0 0' : 0,
+          fontFamily: fiveosTheme.typography.fontFamily,
+          fontSize: shouldShowBack ? '28px' : '34px',
+          fontWeight: fiveosTheme.typography.fontWeight.semibold,
+          color: fiveosTheme.colors.text.primary,
+          letterSpacing: '-0.5px',
+          lineHeight: 1.15,
+        }}
+      >
+        {String(t(nameLocale))}
+      </h1>
     </div>
   );
 };

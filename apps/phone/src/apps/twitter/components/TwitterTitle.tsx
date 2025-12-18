@@ -1,9 +1,25 @@
-import { Bird } from 'lucide-react';
+import React from 'react';
 
+// Modern X logo for header
 export function LifeInvaderTitle() {
   return (
-    <div className='h-[50px] w-full flex nowrap flex-row justify-center items-center bg-neutral-700 rounded border border-neutral-600'>
-      <Bird size={24} className='text-sky-400'/>
+    <div
+      className="h-[50px] w-full flex nowrap flex-row justify-center items-center rounded-xl"
+      style={{
+        background: 'linear-gradient(135deg, rgba(30, 30, 30, 0.9) 0%, rgba(20, 20, 20, 0.95) 100%)',
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+      }}
+    >
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className="text-white"
+      >
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+      </svg>
     </div>
   );
 }

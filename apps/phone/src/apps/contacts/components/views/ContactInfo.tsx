@@ -1,5 +1,4 @@
 import React, { HTMLAttributes, useEffect, useState } from 'react';
-import makeStyles from '@mui/styles/makeStyles';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useParams } from 'react-router-dom';
 import { useContactActions } from '../../hooks/useContactActions';
@@ -12,12 +11,12 @@ import { NPWDButton } from '@npwd/keyos';
 import { ContactsDatabaseLimits } from '@typings/contact';
 import { useContactsAPI } from '../../hooks/useContactsAPI';
 import { SendMoneyModal } from '../../components/modals/SendMoney';
-import { ArrowLeft, HelpingHand, MessageCircle, Phone, Trash2 } from 'lucide-react';
+import { ChevronLeft, Phone, MessageCircle, Video, Mail, MoreHorizontal, Trash2 } from 'lucide-react';
 import LogDebugEvent from '@os/debug/LogDebugEvents';
 import { useModal } from '@apps/contacts/hooks/useModal';
 import { usePhone } from '@os/phone/hooks/usePhone';
-import { cn } from '@utils/css';
 import { initials } from '@utils/misc';
+import { fiveosTheme } from '../../../../styles/fiveos.theme';
 
 interface ContactInfoRouteParams {
   mode: string;
@@ -31,47 +30,33 @@ interface ContactInfoRouteQuery {
   avatar?: string;
 }
 
-const useStyles = makeStyles({
-  root: {
-    height: '100%',
-    width: '100%',
-  },
-  listContainer: {
-    marginTop: 30,
-    width: '75%',
-    margin: '0 auto',
-    textAlign: 'center',
-  },
-  avatar: {
-    margin: 'auto',
-    height: '125px',
-    width: '124px',
-    marginBottom: 29,
-  },
-  input: {
-    marginBottom: 20,
-    margin: 'auto',
-    textAlign: 'center',
-  },
-  inputProps: {
-    fontSize: 22,
-  },
-  button: {
-    color: '#000000',
-    backgroundColor: '#838383',
-    '&:hover': {
-      backgroundColor: '#6a6a6a',
-    },
-  },
-});
+// Avatar gradient based on name
+const getAvatarGradient = (name: string): string => {
+  const gradients = [
+    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+    'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+  ];
+  const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return gradients[hash % gradients.length];
+};
 
+/**
+ * FiveOS Contact Info Page
+ * 
+ * iOS-style contact detail view with:
+ * - Large avatar at top
+ * - Name centered below
+ * - Action buttons (call, message, video, mail)
+ * - Edit button in top right
+ */
 const ContactsInfoPage: React.FC = () => {
-  const classes = useStyles();
   const history = useHistory();
   const { id } = useParams<ContactInfoRouteParams>();
   const {
     addNumber,
-    // Because this is mispelled absolutely everywhere
     referal: referral,
     avatar: avatarParam,
     name: nameParam,
@@ -87,13 +72,15 @@ const ContactsInfoPage: React.FC = () => {
   const { goToConversation } = useMessages();
 
   const contact = getContact(parseInt(id));
+  const isNewContact = id === '-1';
 
   const [name, setName] = useState(contact?.display ?? '');
   const [number, setNumber] = useState(contact?.number ?? '');
   const [avatar, setAvatar] = useState(
     contact?.avatar ?? 'https://i.fivemanage.com/images/3ClWwmpwkFhL.png',
   );
-  // Set state after checking if null
+  const [isEditing, setIsEditing] = useState(isNewContact);
+  const [showOptions, setShowOptions] = useState(false);
 
   const [t] = useTranslation();
   const { ResourceConfig } = usePhone();
@@ -131,31 +118,21 @@ const ContactsInfoPage: React.FC = () => {
 
   const handleMessage = () => {
     const phoneNumber = number.toString();
-    LogDebugEvent({
-      action: 'Routing to Message',
-      level: 1,
-      data: { phoneNumber },
-    });
     const conversation = findExistingConversation(myPhoneNumber, phoneNumber);
     if (conversation) {
       return goToConversation(conversation);
     }
-
     history.push(`/messages/new?phoneNumber=${phoneNumber}`);
   };
 
   const handleContactDelete = () => {
     deleteContact({ id: contact.id });
+    history.goBack();
   };
 
   const handleContactUpdate = () => {
     updateContact({ id: contact.id, number, avatar, display: name });
-  };
-
-  const openpayModal = () => {
-    if (ResourceConfig?.general?.useResourceIntegration && ResourceConfig?.contacts?.frameworkPay) {
-      setContactPayModal(true);
-    }
+    setIsEditing(false);
   };
 
   useEffect(() => {
@@ -167,116 +144,332 @@ const ContactsInfoPage: React.FC = () => {
   if (!ResourceConfig) return null;
 
   return (
-    <div className="mx-auto h-full w-full">
+    <div
+      style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        paddingTop: '54px',
+      }}
+    >
       <SendMoneyModal
         open={contactPayModal}
         closeModal={() => setContactPayModal(false)}
         openContact={number}
       />
-      <button
-        onClick={() => history.goBack()}
-        className="ml-4 mt-4 rounded-md px-3 py-1 hover:dark:bg-neutral-800"
+
+      {/* Header with back and edit/more buttons */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '12px 16px',
+        }}
       >
-        <ArrowLeft className="h-6 w-6 dark:text-neutral-300" />
-      </button>
-      <div className="mx-auto w-9/12">
-        <div>
-          {avatar && avatar.length > 0 ? (
-            <img
-              src={avatar}
-              className="mx-auto h-24 w-24 rounded-full text-center"
-              alt={'avatar'}
-            />
-          ) : (
-            <div className="rounded-full-600 mx-auto h-24 w-24 text-center">
-              <span className="text-5xl text-gray-600 dark:text-gray-300">
-                {initials(contact.display)}
-              </span>
-            </div>
+        {/* Back button */}
+        <button
+          onClick={() => history.goBack()}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '4px',
+          }}
+        >
+          <ChevronLeft size={28} color={fiveosTheme.colors.accent.blue} />
+          <span
+            style={{
+              fontFamily: fiveosTheme.typography.fontFamily,
+              fontSize: '17px',
+              color: fiveosTheme.colors.accent.blue,
+            }}
+          >
+            {String(t('APPS_CONTACTS'))}
+          </span>
+        </button>
+
+        {/* Right buttons */}
+        <div style={{ display: 'flex', gap: '16px' }}>
+          {contact && !isEditing && (
+            <>
+              <button
+                onClick={() => setIsEditing(true)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontFamily: fiveosTheme.typography.fontFamily,
+                  fontSize: '17px',
+                  color: fiveosTheme.colors.accent.blue,
+                }}
+              >
+                {String(t('GENERIC.EDIT'))}
+              </button>
+            </>
+          )}
+          {isEditing && contact && (
+            <button
+              onClick={handleContactUpdate}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: fiveosTheme.typography.fontFamily,
+                fontSize: '17px',
+                fontWeight: 600,
+                color: fiveosTheme.colors.accent.blue,
+              }}
+            >
+              {String(t('GENERIC.DONE'))}
+            </button>
           )}
         </div>
-        <div className="mt-8 space-y-2">
-          <div className="text-sm font-medium text-neutral-400">{t('CONTACTS.FORM_NAME')}</div>
-          <NPWDInput
-            value={name}
-            onChange={handleDisplayChange}
-            className="focus:ring-2 focus:ring-blue-500"
+      </div>
+
+      {/* Avatar and Name */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          padding: '20px',
+          gap: '12px',
+        }}
+      >
+        {/* Avatar */}
+        {avatar && avatar.length > 0 ? (
+          <img
+            src={avatar}
+            style={{
+              width: '100px',
+              height: '100px',
+              borderRadius: '50%',
+              objectFit: 'cover',
+            }}
+            alt="avatar"
           />
-        </div>
-
-        {contact && (
-          <div className="mt-4 flex w-full items-center justify-between">
-            <ContactAction
-              onClick={startCall}
-              Icon={Phone}
-              className="border-blue-500 bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-500 dark:text-white hover:dark:bg-blue-600"
-            />
-            <ContactAction onClick={handleMessage} Icon={MessageCircle} />
-
-            {ResourceConfig?.general?.useResourceIntegration &&
-              ResourceConfig?.contacts?.frameworkPay && (
-                <button
-                  onClick={openpayModal}
-                  className="group flex items-center justify-center rounded-md py-2 dark:bg-neutral-800 dark:hover:bg-neutral-700"
-                >
-                  <HelpingHand className="h-6 w-6 dark:text-neutral-400 dark:group-hover:text-neutral-100" />
-                </button>
-              )}
-            <ContactAction onClick={handleContactDelete} Icon={Trash2} />
+        ) : (
+          <div
+            style={{
+              width: '100px',
+              height: '100px',
+              borderRadius: '50%',
+              background: getAvatarGradient(name || 'New'),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span
+              style={{
+                fontFamily: fiveosTheme.typography.fontFamily,
+                fontSize: '36px',
+                fontWeight: 500,
+                color: 'white',
+              }}
+            >
+              {initials(name || 'N')}
+            </span>
           </div>
         )}
 
-        <div className="mt-8 space-y-4">
-          <div className="space-y-2">
-            <div className="text-sm font-medium text-neutral-400">{t('CONTACTS.FORM_NUMBER')}</div>
+        {/* Name */}
+        {isEditing ? (
+          <NPWDInput
+            value={name}
+            onChange={handleDisplayChange}
+            placeholder={String(t('CONTACTS.FORM_NAME'))}
+            style={{
+              textAlign: 'center',
+              fontSize: '24px',
+              fontWeight: 600,
+            }}
+          />
+        ) : (
+          <h1
+            style={{
+              fontFamily: fiveosTheme.typography.fontFamily,
+              fontSize: '24px',
+              fontWeight: 600,
+              color: 'white',
+              margin: 0,
+            }}
+          >
+            {name || String(t('CONTACTS.FORM_NAME'))}
+          </h1>
+        )}
+      </div>
+
+      {/* Action buttons - iOS style */}
+      {contact && !isEditing && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '24px',
+            padding: '16px',
+          }}
+        >
+          <ActionButton
+            icon={<Phone size={22} />}
+            label={String(t('DIALER.ACTIONS.CALL'))}
+            onClick={startCall}
+          />
+          <ActionButton
+            icon={<MessageCircle size={22} />}
+            label={String(t('GENERIC.MESSAGE'))}
+            onClick={handleMessage}
+          />
+          <ActionButton
+            icon={<Trash2 size={22} />}
+            label={String(t('GENERIC.DELETE'))}
+            onClick={handleContactDelete}
+            color="#FF3B30"
+          />
+        </div>
+      )}
+
+      {/* Form fields */}
+      <div
+        style={{
+          flex: 1,
+          padding: '16px 20px',
+          overflowY: 'auto',
+        }}
+      >
+        {/* Phone number section */}
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.08)',
+            borderRadius: '12px',
+            padding: '12px 16px',
+            marginBottom: '16px',
+          }}
+        >
+          <label
+            style={{
+              fontFamily: fiveosTheme.typography.fontFamily,
+              fontSize: '13px',
+              color: 'rgba(255, 255, 255, 0.5)',
+              display: 'block',
+              marginBottom: '4px',
+            }}
+          >
+            {String(t('CONTACTS.FORM_NUMBER'))}
+          </label>
+          {isEditing ? (
             <NPWDInput
               value={number}
               onChange={handleNumberChange}
-              className="focus:ring-2 focus:ring-blue-500"
+              style={{ fontSize: '17px' }}
             />
-          </div>
-          <div className="space-y-2">
-            <div className="text-sm font-medium text-neutral-400">{t('CONTACTS.FORM_AVATAR')}</div>
+          ) : (
+            <span
+              style={{
+                fontFamily: fiveosTheme.typography.fontFamily,
+                fontSize: '17px',
+                color: fiveosTheme.colors.accent.blue,
+              }}
+            >
+              {number}
+            </span>
+          )}
+        </div>
+
+        {/* Avatar URL - only in edit mode */}
+        {isEditing && (
+          <div
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              borderRadius: '12px',
+              padding: '12px 16px',
+              marginBottom: '16px',
+            }}
+          >
+            <label
+              style={{
+                fontFamily: fiveosTheme.typography.fontFamily,
+                fontSize: '13px',
+                color: 'rgba(255, 255, 255, 0.5)',
+                display: 'block',
+                marginBottom: '4px',
+              }}
+            >
+              {String(t('CONTACTS.FORM_AVATAR'))}
+            </label>
             <NPWDInput
               value={avatar}
               onChange={handleAvatarChange}
-              className="outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ fontSize: '15px' }}
             />
           </div>
-        </div>
+        )}
 
-        <div className="mt-8">
-          {contact ? (
-            <NPWDButton onClick={handleContactUpdate} className="w-full">
-              {t('GENERIC.UPDATE')}
-            </NPWDButton>
-          ) : (
-            <NPWDButton onClick={handleContactAdd} className="w-full">
-              {t('GENERIC.ADD')}
-            </NPWDButton>
-          )}
-        </div>
+        {/* Add button for new contacts */}
+        {isNewContact && (
+          <NPWDButton
+            onClick={handleContactAdd}
+            style={{
+              width: '100%',
+              marginTop: '20px',
+            }}
+          >
+            {String(t('GENERIC.ADD'))}
+          </NPWDButton>
+        )}
       </div>
     </div>
   );
 };
 
-interface ContactActionProps extends HTMLAttributes<HTMLButtonElement> {
+// iOS-style action button
+const ActionButton: React.FC<{
+  icon: React.ReactNode;
+  label: string;
   onClick: () => void;
-  Icon: React.Component;
-}
-export const ContactAction: React.FC<ContactActionProps> = ({ Icon, onClick, ...props }) => {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        'group flex items-center justify-center rounded-full bg-neutral-200 p-2.5 text-neutral-900 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700',
-        props.className,
-      )}
+  color?: string;
+}> = ({ icon, label, onClick, color }) => (
+  <button
+    onClick={onClick}
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '6px',
+      background: 'transparent',
+      border: 'none',
+      cursor: 'pointer',
+      minWidth: '60px',
+    }}
+  >
+    <div
+      style={{
+        width: '50px',
+        height: '50px',
+        borderRadius: '50%',
+        background: 'rgba(255, 255, 255, 0.1)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: color || fiveosTheme.colors.accent.blue,
+      }}
     >
-      <Icon className="h-6 w-6" />
-    </button>
-  );
-};
+      {icon}
+    </div>
+    <span
+      style={{
+        fontFamily: fiveosTheme.typography.fontFamily,
+        fontSize: '11px',
+        color: color || fiveosTheme.colors.accent.blue,
+      }}
+    >
+      {label}
+    </span>
+  </button>
+);
 
 export default ContactsInfoPage;

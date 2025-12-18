@@ -55,6 +55,7 @@ export const formState = atom<MarketplaceListingBase>({
     title: '',
     description: '',
     url: '',
+    price: '',
   },
 });
 

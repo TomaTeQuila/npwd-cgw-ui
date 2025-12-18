@@ -1,42 +1,22 @@
 import React, { useContext } from 'react';
-import { Box, IconButton, Paper } from '@mui/material';
-import { Theme } from '@mui/material/styles';
-import makeStyles from '@mui/styles/makeStyles';
-import PhoneIcon from '@mui/icons-material/Phone';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import { DialInputCtx, IDialInputCtx } from '../context/InputContext';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { InputBase } from '@ui/components/Input';
+import { Phone, UserPlus, Delete } from 'lucide-react';
+import { DialInputCtx, IDialInputCtx } from '../context/InputContext';
 import { useCall } from '@os/call/hooks/useCall';
-import { toggleKeys } from '@ui/components/Input';
+import { fiveosTheme } from '../../../styles/fiveos.theme';
 
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    textAlign: 'right',
-    paddingTop: theme.spacing(3),
-    paddingBottom: theme.spacing(3),
-    paddingLeft: theme.spacing(5),
-    paddingRight: theme.spacing(5),
-    display: 'flex',
-    height: 100,
-  },
-  input: {
-    flex: 1,
-    fontSize: theme.typography.h6.fontSize,
-  },
-  iconBtn: {
-    padding: 10,
-  },
-}));
-
+/**
+ * FiveOS Dialer Input
+ * 
+ * Large number display with call button and actions.
+ */
 export const DialerInput: React.FC = () => {
-  const classes = useStyles();
   const history = useHistory();
   const [t] = useTranslation();
   const { initializeCall } = useCall();
 
-  const { inputVal, set } = useContext<IDialInputCtx>(DialInputCtx);
+  const { inputVal, set, removeOne } = useContext<IDialInputCtx>(DialInputCtx);
 
   const handleCall = (number: string) => {
     initializeCall(number);
@@ -47,32 +27,121 @@ export const DialerInput: React.FC = () => {
   };
 
   return (
-    <Box component={Paper} className={classes.root}>
-      <InputBase
-        placeholder={t('DIALER.INPUT_PLACEHOLDER')}
-        className={classes.input}
-        value={inputVal}
-        onChange={(e) => set(e.target.value)}
-      />
-      <IconButton
-        color="primary"
-        className={classes.iconBtn}
-        disabled={inputVal <= ''}
-        onClick={() => handleCall(inputVal)}
-        size="large"
-      >
-        <PhoneIcon fontSize="large" />
-      </IconButton>
-      <IconButton
-        className={classes.iconBtn}
-        onClick={() => handleNewContact(inputVal)}
-        onMouseUp={() => {
-          toggleKeys(false);
+    <div
+      className="fiveos-dialer-input"
+      style={{
+        padding: '20px 24px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '20px',
+      }}
+    >
+      {/* Number display */}
+      <div
+        style={{
+          width: '100%',
+          minHeight: '60px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
         }}
-        size="large"
       >
-        <PersonAddIcon fontSize="large" />
-      </IconButton>
-    </Box>
+        <span
+          style={{
+            fontFamily: fiveosTheme.typography.fontFamily,
+            fontSize: inputVal.length > 10 ? '28px' : '38px',
+            fontWeight: fiveosTheme.typography.fontWeight.light,
+            color: 'rgba(255, 255, 255, 0.95)',
+            letterSpacing: '2px',
+            textAlign: 'center',
+            transition: 'font-size 150ms ease',
+          }}
+        >
+          {inputVal || t('DIALER.INPUT_PLACEHOLDER')}
+        </span>
+
+        {/* Delete button */}
+        {inputVal && (
+          <button
+            onClick={removeOne}
+            style={{
+              position: 'absolute',
+              right: 0,
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Delete size={24} color="rgba(255, 255, 255, 0.5)" />
+          </button>
+        )}
+      </div>
+
+      {/* Action buttons */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '40px',
+        }}
+      >
+        {/* Add contact */}
+        <button
+          onClick={() => inputVal && handleNewContact(inputVal)}
+          disabled={!inputVal}
+          style={{
+            width: '50px',
+            height: '50px',
+            borderRadius: '50%',
+            background: 'rgba(255, 255, 255, 0.08)',
+            border: 'none',
+            cursor: inputVal ? 'pointer' : 'default',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: inputVal ? 1 : 0.4,
+            transition: 'all 150ms ease',
+          }}
+        >
+          <UserPlus size={22} color="rgba(255, 255, 255, 0.9)" />
+        </button>
+
+        {/* Call button - green, larger */}
+        <button
+          onClick={() => inputVal && handleCall(inputVal)}
+          disabled={!inputVal}
+          style={{
+            width: '75px',
+            height: '75px',
+            borderRadius: '50%',
+            background: inputVal
+              ? fiveosTheme.colors.accent.green
+              : 'rgba(52, 199, 89, 0.4)',
+            border: 'none',
+            cursor: inputVal ? 'pointer' : 'default',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: inputVal
+              ? '0 6px 20px rgba(52, 199, 89, 0.4)'
+              : 'none',
+            transition: 'all 150ms ease',
+          }}
+          className={inputVal ? 'hover:scale-105 active:scale-95' : ''}
+        >
+          <Phone size={32} color="white" />
+        </button>
+
+        {/* Placeholder for symmetry */}
+        <div style={{ width: '50px', height: '50px' }} />
+      </div>
+    </div>
   );
 };

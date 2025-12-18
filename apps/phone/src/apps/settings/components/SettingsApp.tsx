@@ -1,6 +1,5 @@
 import React from 'react';
 import { AppWrapper } from '@ui/components';
-import { AppTitle } from '@ui/components/AppTitle';
 import { AppContent } from '@ui/components/AppContent';
 import { useContextMenu, MapSettingItem, SettingOption } from '@ui/hooks/useContextMenu';
 import { usePhoneConfig } from '../../../config/hooks/usePhoneConfig';
@@ -19,7 +18,6 @@ import {
   BookA,
   EyeOff,
   FileMusic,
-  LayoutGrid,
   Wallpaper,
   Palette,
   Phone,
@@ -29,9 +27,11 @@ import {
   ZoomIn,
   ListFilter,
   Eraser,
+  Bell,
+  BellRing,
+  Image,
 } from 'lucide-react';
 import makeStyles from '@mui/styles/makeStyles';
-import { useTheme } from '@mui/material';
 import { useResetSettings, useSettings } from '../hooks/useSettings';
 import { setClipboard } from '@os/phone/hooks/useClipboard';
 import { useSnackbar } from '@os/snackbar/hooks/useSnackbar';
@@ -42,6 +42,7 @@ import { IconSetObject } from '@typings/settings';
 import { useCustomWallpaperModal } from '../state/customWallpaper.state';
 import fetchNui from '@utils/fetchNui';
 import { SettingEvents } from '@typings/settings';
+import { fiveosTheme } from '../../../styles/fiveos.theme';
 
 const useStyles = makeStyles({
   backgroundModal: {
@@ -56,6 +57,12 @@ const useStyles = makeStyles({
   },
 });
 
+/**
+ * FiveOS Settings App
+ * 
+ * Rediseñado con estilo iOS - secciones redondeadas,
+ * iconos con fondo de color, y navegación visual clara.
+ */
 export const SettingsApp: React.FC = () => {
   const [config] = usePhoneConfig();
   const myNumber = useMyPhoneNumber();
@@ -64,14 +71,13 @@ export const SettingsApp: React.FC = () => {
   const [customWallpaperState, setCustomWallpaperState] = useCustomWallpaperModal();
 
   const { addAlert } = useSnackbar();
-
   const resetSettings = useResetSettings();
 
   const handleSettingChange = (key: string | number, value: unknown) => {
     setSettings({ ...settings, [key]: value });
 
     if (key === 'theme') {
-      if (value.value === 'taso-dark') {
+      if ((value as any).value === 'taso-dark') {
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');
@@ -160,30 +166,29 @@ export const SettingsApp: React.FC = () => {
 
   const [openMenu, closeMenu, ContextMenu, isMenuOpen] = useContextMenu();
   const classes = useStyles();
-  const theme = useTheme();
+
   return (
     <AppWrapper>
       {/* Used for picking and viewing a custom wallpaper */}
       <WallpaperModal />
       <div className={customWallpaperState ? classes.backgroundModal : undefined} />
-      {/*
-        Sometimes depending on the height of the app, we sometimes want it to fill its parent
-        and other times we want it to grow with the content. AppContent implementation currently
-        has a style of height: 100%, attached to its main class. We overwrite this here by
-        passing a style prop of height: 'auto'. This isn't ideal but it works without breaking
-        any of the other apps.
 
-        This also fixes Material UI v5's background color properly
-      */}
-      <AppContent
+      {/* Settings content directly - no large header */}      <AppContent
         backdrop={isMenuOpen}
         onClickBackdrop={closeMenu}
         display="flex"
         style={{
           height: 'auto',
+          background: 'transparent',
         }}
       >
-        <div className="py-4">
+        <div
+          className="fiveos-settings-content"
+          style={{
+            padding: '0 16px 100px 16px',
+          }}
+        >
+          {/* Phone Section */}
           <SettingsCategory title={t('SETTINGS.CATEGORY.PHONE')}>
             <SettingItemIconAction
               label={t('SETTINGS.PHONE_NUMBER')}
@@ -192,58 +197,60 @@ export const SettingsApp: React.FC = () => {
                 content: 'number',
               })}
               Icon={Phone}
+              iconColor={fiveosTheme.colors.accent.green}
               actionIcon={<FileCopy />}
               handleAction={handleCopyPhoneNumber}
-              theme={theme}
             />
             <SoundItem
               label={t('SETTINGS.OPTIONS.RINGTONE')}
               value={settings.ringtone.label}
               options={ringtones}
               onClick={openMenu}
-              Icon={FileMusic}
+              Icon={BellRing}
+              iconColor={fiveosTheme.colors.accent.red}
               tooltip={t('SETTINGS.PREVIEW_SOUND')}
               onPreviewClicked={() => {
                 fetchNui(SettingEvents.PREVIEW_RINGTONE);
               }}
-              theme={theme}
             />
             <SoundItem
               label={t('SETTINGS.OPTIONS.NOTIFICATION')}
               value={settings.notiSound.label}
               options={notifications}
               onClick={openMenu}
-              Icon={FileMusic}
+              Icon={Bell}
+              iconColor={fiveosTheme.colors.accent.pink}
               tooltip={t('SETTINGS.PREVIEW_SOUND')}
               onPreviewClicked={() => {
                 fetchNui(SettingEvents.PREVIEW_ALERT);
               }}
-              theme={theme}
             />
             <SettingSwitch
               label={t('SETTINGS.OPTIONS.STREAMER_MODE.TITLE')}
               secondary={t('SETTINGS.OPTIONS.STREAMER_MODE.DESCRIPTION')}
               icon={<EyeOff />}
+              iconColor={fiveosTheme.colors.accent.purple}
               value={settings.streamerMode}
-              onClick={(curr) => handleSettingChange('streamerMode', !curr)}
-              theme={theme}
+              onClick={(curr: boolean) => handleSettingChange('streamerMode', !curr)}
             />
             <SettingSwitch
               label={t('SETTINGS.OPTIONS.ANONYMOUS_MODE.TITLE')}
               secondary={t('SETTINGS.OPTIONS.ANONYMOUS_MODE.DESCRIPTION')}
               icon={<ShieldOff />}
+              iconColor={fiveosTheme.colors.accent.orange}
               value={settings.anonymousMode}
-              onClick={(curr) => handleSettingChange('anonymousMode', !curr)}
-              theme={theme}
+              onClick={(curr: boolean) => handleSettingChange('anonymousMode', !curr)}
             />
             <SettingItemSlider
               label={t('SETTINGS.OPTIONS.CALL_VOLUME')}
               icon={<Volume2 />}
+              iconColor={fiveosTheme.colors.accent.blue}
               value={settings.callVolume}
               onCommit={(val) => handleSettingChange('callVolume', val)}
-              theme={theme}
             />
           </SettingsCategory>
+
+          {/* Appearance Section */}
           <SettingsCategory title={t('SETTINGS.CATEGORY.APPEARANCE')}>
             <SettingItem
               label={t('SETTINGS.OPTIONS.LANGUAGE')}
@@ -251,7 +258,7 @@ export const SettingsApp: React.FC = () => {
               options={languages}
               onClick={openMenu}
               Icon={BookA}
-              theme={theme}
+              iconColor={fiveosTheme.colors.accent.blue}
             />
             <SettingItem
               label={t('SETTINGS.OPTIONS.THEME')}
@@ -259,15 +266,15 @@ export const SettingsApp: React.FC = () => {
               options={themes}
               onClick={openMenu}
               Icon={Palette}
-              theme={theme}
+              iconColor={fiveosTheme.colors.accent.purple}
             />
             <SettingItem
               label={t('SETTINGS.OPTIONS.WALLPAPER')}
               value={settings.wallpaper.label}
               options={[...wallpapers, customWallpaper]}
               onClick={openMenu}
-              Icon={Wallpaper}
-              theme={theme}
+              Icon={Image}
+              iconColor={fiveosTheme.colors.accent.teal}
             />
             <SettingItem
               label={t('SETTINGS.OPTIONS.FRAME')}
@@ -275,7 +282,7 @@ export const SettingsApp: React.FC = () => {
               options={frames}
               onClick={openMenu}
               Icon={Smartphone}
-              theme={theme}
+              iconColor="#636366"
             />
             <SettingItem
               label={t('SETTINGS.OPTIONS.ZOOM')}
@@ -283,9 +290,11 @@ export const SettingsApp: React.FC = () => {
               options={zoomOptions}
               onClick={openMenu}
               Icon={ZoomIn}
-              theme={theme}
+              iconColor={fiveosTheme.colors.accent.green}
             />
           </SettingsCategory>
+
+          {/* Twitter Section */}
           <SettingsCategory title={t('APPS_TWITTER')}>
             <SettingItem
               label={t('SETTINGS.OPTIONS.NOTIFICATION_FILTER')}
@@ -293,7 +302,7 @@ export const SettingsApp: React.FC = () => {
               options={twitterNotificationFilters}
               onClick={openMenu}
               Icon={ListFilter}
-              theme={theme}
+              iconColor="#1DA1F2"
             />
             <SettingItem
               label={t('SETTINGS.OPTIONS.NOTIFICATION')}
@@ -301,34 +310,38 @@ export const SettingsApp: React.FC = () => {
               options={twitterNotifications}
               onClick={openMenu}
               Icon={FileMusic}
-              theme={theme}
+              iconColor="#1DA1F2"
             />
             <SettingItemSlider
               label={t('SETTINGS.OPTIONS.NOTIFICATION_VOLUME')}
               value={settings.TWITTER_notiSoundVol}
               onCommit={(val) => handleSettingChange('TWITTER_notiSoundVol', val)}
               icon={<Volume2 />}
-              theme={theme}
+              iconColor="#1DA1F2"
             />
           </SettingsCategory>
+
+          {/* Marketplace Section */}
           <SettingsCategory title={t('APPS_MARKETPLACE')}>
             <SettingSwitch
               label={t('SETTINGS.MARKETPLACE.NOTIFICATION')}
               secondary={t('SETTINGS.MARKETPLACE.NOTIFY_NEW_LISTING')}
               value={settings.MARKETPLACE_notifyNewListing}
-              icon={<ListFilter />}
-              onClick={(curr) => handleSettingChange('MARKETPLACE_notifyNewListing', !curr)}
-              theme={theme}
+              icon={<Bell />}
+              iconColor="#8B5CF6"
+              onClick={(curr: boolean) => handleSettingChange('MARKETPLACE_notifyNewListing', !curr)}
             />
           </SettingsCategory>
+
+          {/* Actions Section */}
           <SettingsCategory title={t('SETTINGS.CATEGORY.ACTIONS')}>
             <SettingItem
               label={t('SETTINGS.OPTIONS.RESET_SETTINGS')}
               value={t('SETTINGS.OPTIONS.RESET_SETTINGS_DESC')}
               Icon={Eraser}
+              iconColor={fiveosTheme.colors.accent.red}
               onClick={openMenu}
               options={resetSettingsOpts}
-              theme={theme}
             />
           </SettingsCategory>
         </div>

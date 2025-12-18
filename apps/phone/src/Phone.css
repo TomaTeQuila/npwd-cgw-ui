@@ -1,3 +1,10 @@
+/**
+ * FiveOS Phone Styles
+ * 
+ * Estilos base para el contenedor del teléfono.
+ * Actualizado para FiveOS con Dynamic Island.
+ */
+
 .PhoneWrapper {
   width: 100vw;
   height: 100vh;
@@ -6,60 +13,82 @@
 
 .Phone {
   position: absolute;
-  right: 0;
-  width: 500px;
-  height: 1000px;
-  background-size: cover;
+  right: 20px;
+  /* Size is now controlled by PhoneFrame component */
 }
 
-.PhoneFrame {
-  position: absolute;
-  z-index: 999;
-  width: 500px;
-  height: 1000px;
-  pointer-events: none;
-}
+/* Legacy frame support removed - now using CSS-based PhoneFrame */
 
 .PhoneScreen {
   overflow: hidden;
-  position: absolute;
-  background-color: black;
-  bottom: 100px;
-  left: 50px;
-  right: 50px;
-  top: 100px;
+  position: relative;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  border-radius: 20px;
+  background-color: black;
+  /* Border radius handled by PhoneFrame */
 }
 
 .PhoneAppContainer {
-  height: 90%;
+  height: calc(100% - 28px);
+  /* Account for home indicator */
   width: 100%;
   display: flex;
   flex-direction: column;
   position: relative;
+  padding-top: 54px;
+  /* Space for Dynamic Island + status bar */
 }
 
+/* === SCROLLBAR STYLING === */
 * {
   box-sizing: border-box;
 }
+
 *::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  background-color: #666;
-}
-*::-webkit-scrollbar {
-  width: 3px;
-  background-color: transparent;
-}
-*::-webkit-scrollbar-thumb {
-  background-color: #f5f5f5;
+  background: transparent;
 }
 
+*::-webkit-scrollbar {
+  width: 4px;
+  background-color: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* === SNACKBAR POSITIONING === */
 .notistack-SnackbarContainer {
   position: absolute !important;
-  top: 0 !important;
+  top: 60px !important;
+  /* Below Dynamic Island */
+}
+
+/* === FIVEOS GLOBAL UTILITIES === */
+
+/* Hide scrollbar for clean look */
+.fiveos-hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.fiveos-hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Safe area padding for Dynamic Island */
+.fiveos-safe-top {
+  padding-top: 54px;
+}
+
+/* Safe area for home indicator */
+.fiveos-safe-bottom {
+  padding-bottom: 34px;
 }

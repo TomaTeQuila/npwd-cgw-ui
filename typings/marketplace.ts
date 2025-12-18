@@ -10,6 +10,7 @@ export interface MarketplaceListingBase {
   title: string;
   url: string;
   description: string;
+  price?: string; // Optional price display (e.g., "$500", "Gratis", "Negociable")
 }
 
 export enum MarketplaceDatabaseLimits {

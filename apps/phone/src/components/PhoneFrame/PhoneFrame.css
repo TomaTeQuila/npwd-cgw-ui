@@ -1,0 +1,188 @@
+/**
+ * FiveOS Phone Frame Styles
+ * 
+ * CSS para el frame del teléfono estilo iPhone 17.
+ * Diseñado para verse premium y moderno.
+ */
+
+/* === PHONE FRAME CONTAINER === */
+.fiveos-phone-frame {
+    position: relative;
+    width: 400px;
+    height: 860px;
+
+    /* CSS Custom Properties for color theming */
+    --frame-bezel: #1a1a1a;
+    --frame-edge: #0a0a0a;
+    --frame-highlight: rgba(255, 255, 255, 0.08);
+}
+
+/* === OUTER BEZEL === */
+.fiveos-phone-bezel {
+    position: absolute;
+    inset: 0;
+    border-radius: 54px;
+    background: linear-gradient(145deg,
+            var(--frame-bezel) 0%,
+            var(--frame-edge) 100%);
+    box-shadow:
+        /* Outer shadow for depth */
+        0 25px 80px rgba(0, 0, 0, 0.5),
+        0 15px 35px rgba(0, 0, 0, 0.4),
+        /* Inset highlight for bevel */
+        inset 0 1px 1px var(--frame-highlight),
+        /* Subtle outer glow */
+        0 0 0 1px rgba(0, 0, 0, 0.8);
+    padding: 10px;
+}
+
+/* === INNER EDGE (reflection band) === */
+.fiveos-phone-edge {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 46px;
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.04) 0%,
+            transparent 2%,
+            transparent 98%,
+            rgba(0, 0, 0, 0.2) 100%);
+    padding: 2px;
+    overflow: hidden;
+}
+
+/* === SCREEN AREA === */
+.fiveos-phone-screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 44px;
+    background: #000;
+    overflow: hidden;
+
+    /* Screen reflection effect */
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+}
+
+/* === SCREEN CONTENT === */
+.fiveos-phone-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* === SCREEN INNER SHADOW (for depth) === */
+.fiveos-screen-shadow {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow:
+        inset 0 0 0 0.5px rgba(255, 255, 255, 0.05),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+}
+
+/* === SIDE BUTTONS === */
+
+/* Volume Up */
+.fiveos-button-volume-up {
+    position: absolute;
+    left: -3px;
+    top: 160px;
+    width: 4px;
+    height: 40px;
+    background: linear-gradient(to right,
+            var(--frame-edge) 0%,
+            var(--frame-bezel) 50%,
+            var(--frame-edge) 100%);
+    border-radius: 2px 0 0 2px;
+    box-shadow:
+        -2px 0 4px rgba(0, 0, 0, 0.3),
+        inset 1px 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Volume Down */
+.fiveos-button-volume-down {
+    position: absolute;
+    left: -3px;
+    top: 210px;
+    width: 4px;
+    height: 40px;
+    background: linear-gradient(to right,
+            var(--frame-edge) 0%,
+            var(--frame-bezel) 50%,
+            var(--frame-edge) 100%);
+    border-radius: 2px 0 0 2px;
+    box-shadow:
+        -2px 0 4px rgba(0, 0, 0, 0.3),
+        inset 1px 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Mute switch */
+.fiveos-button-mute {
+    position: absolute;
+    left: -3px;
+    top: 115px;
+    width: 4px;
+    height: 28px;
+    background: linear-gradient(to right,
+            var(--frame-edge) 0%,
+            var(--frame-bezel) 50%,
+            var(--frame-edge) 100%);
+    border-radius: 2px 0 0 2px;
+    box-shadow:
+        -2px 0 4px rgba(0, 0, 0, 0.3),
+        inset 1px 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Power button */
+.fiveos-button-power {
+    position: absolute;
+    right: -3px;
+    top: 175px;
+    width: 4px;
+    height: 70px;
+    background: linear-gradient(to left,
+            var(--frame-edge) 0%,
+            var(--frame-bezel) 50%,
+            var(--frame-edge) 100%);
+    border-radius: 0 2px 2px 0;
+    box-shadow:
+        2px 0 4px rgba(0, 0, 0, 0.3),
+        inset -1px 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* === DYNAMIC ISLAND ANIMATIONS === */
+.fiveos-dynamic-island {
+    cursor: pointer;
+}
+
+.fiveos-dynamic-island:hover {
+    transform: translateX(-50%) scale(1.02);
+}
+
+.fiveos-dynamic-island:active {
+    transform: translateX(-50%) scale(0.98);
+}
+
+.fiveos-island-expanded {
+    /* Additional styles for expanded state handled in component */
+}
+
+/* === RESPONSIVE SCALING === */
+@media (max-height: 900px) {
+    .fiveos-phone-frame {
+        transform: scale(0.9);
+        transform-origin: bottom right;
+    }
+}
+
+@media (max-height: 800px) {
+    .fiveos-phone-frame {
+        transform: scale(0.8);
+        transform-origin: bottom right;
+    }
+}

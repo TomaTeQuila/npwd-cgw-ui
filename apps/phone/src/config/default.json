@@ -3,28 +3,24 @@
   "defaultLanguage": "en",
   "wallpapers": [
     {
-      "label": "Minimal",
-      "value": "minimal.jpg"
-    },
-    {
-      "label": "Surf",
-      "value": "surf.jpg"
-    },
-    {
       "label": "Waves",
       "value": "waves.jpg"
-    },
-    {
-      "label": "Project Error",
-      "value": "projecterror.jpg"
     },
     {
       "label": "NPWD 2020",
       "value": "npwd2020.png"
     },
     {
+      "label": "Variant1",
+      "value": "variant3.jpg"
+    },
+    {
+      "label": "Sky",
+      "value": "sky.jpg"
+    },
+    {
       "label": "Default",
-      "value": "default.jpg"
+      "value": "variant2.jpg"
     }
   ],
   "frames": [

@@ -1,0 +1,518 @@
+/**
+ * FiveOS Design System - Visual Language CSS
+ * 
+ * Sistema de diseño vivo basado en FiveOS Visual Language Spec v2.0
+ * "Nada debe verse plano, rígido o corporativo. Todo debe parecer iluminado,
+ * en tensión controlada y emocionalmente activo."
+ */
+
+/* ========================================
+   1. DESIGN TOKENS (CSS Variables)
+   ======================================== */
+
+:root {
+  /* === COLOR VOLUMÉTRICO (nunca plano) === */
+  --fiveos-glass: rgba(255, 255, 255, 0.14);
+  --fiveos-glass-hover: rgba(255, 255, 255, 0.18);
+  --fiveos-glass-active: rgba(255, 255, 255, 0.22);
+  --fiveos-glass-secondary: rgba(255, 255, 255, 0.10);
+  
+  --fiveos-stroke: rgba(255, 255, 255, 0.18);
+  --fiveos-stroke-subtle: rgba(255, 255, 255, 0.08);
+  
+  /* Text - nunca blanco puro, siempre volumétrico */
+  --fiveos-text-primary: rgba(255, 255, 255, 0.95);
+  --fiveos-text-secondary: rgba(255, 255, 255, 0.70);
+  --fiveos-text-muted: rgba(255, 255, 255, 0.50);
+  
+  /* Shadows volumétricas */
+  --fiveos-shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --fiveos-shadow-md: 0 12px 35px rgba(0, 0, 0, 0.25);
+  --fiveos-shadow-lg: 0 20px 55px rgba(0, 0, 0, 0.35);
+  --fiveos-shadow-xl: 0 30px 80px rgba(0, 0, 0, 0.45);
+  
+  /* Blur óptico (no uniforme) */
+  --fiveos-blur-sm: blur(8px);
+  --fiveos-blur-md: blur(16px);
+  --fiveos-blur-lg: blur(24px);
+  --fiveos-blur-xl: blur(40px);
+  
+  /* Accent colors - iluminados, no pintados */
+  --fiveos-accent-blue: #007AFF;
+  --fiveos-accent-green: #34C759;
+  --fiveos-accent-red: #FF3B30;
+  --fiveos-accent-orange: #FF9500;
+  --fiveos-accent-purple: #AF52DE;
+  --fiveos-accent-pink: #FF2D55;
+  
+  /* Spacing - mucho aire */
+  --fiveos-space-xs: 4px;
+  --fiveos-space-sm: 8px;
+  --fiveos-space-md: 16px;
+  --fiveos-space-lg: 24px;
+  --fiveos-space-xl: 32px;
+  --fiveos-space-2xl: 48px;
+  
+  /* Border radius - suave, orgánico */
+  --fiveos-radius-sm: 8px;
+  --fiveos-radius-md: 14px;
+  --fiveos-radius-lg: 20px;
+  --fiveos-radius-xl: 28px;
+  --fiveos-radius-full: 9999px;
+  
+  /* Typography - ligera y espaciada */
+  --fiveos-font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "Segoe UI", Roboto, Arial, sans-serif;
+  --fiveos-font-weight-light: 300;
+  --fiveos-font-weight-regular: 400;
+  --fiveos-font-weight-medium: 500;
+  --fiveos-font-weight-semibold: 600;
+  
+  --fiveos-line-height-tight: 1.2;
+  --fiveos-line-height-normal: 1.5;
+  --fiveos-line-height-relaxed: 1.7;
+  
+  /* Transitions - orgánicas */
+  --fiveos-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --fiveos-transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --fiveos-transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --fiveos-transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* === DARK THEME (Default) === */
+.fiveos-dark,
+:root {
+  --fiveos-bg-primary: #000000;
+  --fiveos-bg-secondary: rgba(28, 28, 30, 0.95);
+  --fiveos-bg-tertiary: rgba(44, 44, 46, 0.90);
+  --fiveos-bg-elevated: rgba(58, 58, 60, 0.85);
+  
+  --fiveos-surface: rgba(255, 255, 255, 0.08);
+  --fiveos-surface-hover: rgba(255, 255, 255, 0.12);
+  --fiveos-surface-active: rgba(255, 255, 255, 0.16);
+  
+  --fiveos-divider: rgba(255, 255, 255, 0.08);
+}
+
+/* === LIGHT THEME === */
+.fiveos-light {
+  --fiveos-glass: rgba(0, 0, 0, 0.06);
+  --fiveos-glass-hover: rgba(0, 0, 0, 0.09);
+  --fiveos-glass-active: rgba(0, 0, 0, 0.12);
+  --fiveos-glass-secondary: rgba(0, 0, 0, 0.04);
+  
+  --fiveos-stroke: rgba(0, 0, 0, 0.12);
+  --fiveos-stroke-subtle: rgba(0, 0, 0, 0.06);
+  
+  --fiveos-text-primary: rgba(0, 0, 0, 0.90);
+  --fiveos-text-secondary: rgba(0, 0, 0, 0.60);
+  --fiveos-text-muted: rgba(0, 0, 0, 0.40);
+  
+  --fiveos-bg-primary: #F2F2F7;
+  --fiveos-bg-secondary: rgba(255, 255, 255, 0.95);
+  --fiveos-bg-tertiary: rgba(255, 255, 255, 0.90);
+  --fiveos-bg-elevated: rgba(255, 255, 255, 0.85);
+  
+  --fiveos-surface: rgba(0, 0, 0, 0.04);
+  --fiveos-surface-hover: rgba(0, 0, 0, 0.06);
+  --fiveos-surface-active: rgba(0, 0, 0, 0.08);
+  
+  --fiveos-divider: rgba(0, 0, 0, 0.08);
+}
+
+/* ========================================
+   2. GRAINY TEXTURE (Materia viva)
+   ======================================== */
+
+.fiveos-grain {
+  position: relative;
+}
+
+.fiveos-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ========================================
+   3. GLASS SURFACES (Material óptico)
+   ======================================== */
+
+.fiveos-glass {
+  background: linear-gradient(
+    135deg,
+    var(--fiveos-glass) 0%,
+    var(--fiveos-glass-secondary) 100%
+  );
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--fiveos-stroke);
+  box-shadow: var(--fiveos-shadow-md);
+}
+
+.fiveos-glass-card {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid var(--fiveos-stroke);
+  border-radius: var(--fiveos-radius-lg);
+  box-shadow: var(--fiveos-shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Brillo irregular en cards (no "panel limpio") */
+.fiveos-glass-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background:
+    radial-gradient(120px 90px at 30% 20%, rgba(255, 255, 255, 0.18), transparent 60%),
+    radial-gradient(160px 120px at 75% 15%, rgba(255, 255, 255, 0.10), transparent 65%),
+    linear-gradient(140deg, rgba(255, 255, 255, 0.08), transparent 40%);
+  opacity: 0.75;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* ========================================
+   4. DOCK (Dominant floating element)
+   ======================================== */
+
+.fiveos-dock {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(30px) saturate(1.6);
+  -webkit-backdrop-filter: blur(30px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  border-radius: var(--fiveos-radius-xl);
+  box-shadow: var(--fiveos-shadow-xl);
+  padding: var(--fiveos-space-md);
+}
+
+/* ========================================
+   5. ICONS AS OBJECTS (No flat símbolos)
+   ======================================== */
+
+.fiveos-icon {
+  position: relative;
+  border-radius: 22%;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  transition: transform var(--fiveos-transition-fast), 
+              box-shadow var(--fiveos-transition-fast);
+}
+
+/* Luz interna del icono */
+.fiveos-icon::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(70px 60px at 30% 20%, rgba(255, 255, 255, 0.35), transparent 60%),
+    radial-gradient(60px 50px at 70% 75%, rgba(255, 255, 255, 0.15), transparent 60%);
+  filter: blur(8px);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* Overlay de luz */
+.fiveos-icon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    125deg,
+    rgba(255, 255, 255, 0.20) 0%,
+    transparent 35%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.fiveos-icon:hover {
+  transform: scale(1.08);
+  box-shadow: 
+    0 8px 20px rgba(0, 0, 0, 0.30),
+    inset 0 1px 2px rgba(255, 255, 255, 0.20);
+}
+
+.fiveos-icon:active {
+  transform: scale(0.95);
+}
+
+/* ========================================
+   6. BREATHING ANIMATIONS
+   ======================================== */
+
+@keyframes fiveos-drift {
+  0%, 100% {
+    transform: rotate(-3deg) scale(1.02) translate(0, 0);
+  }
+  50% {
+    transform: rotate(-4deg) scale(1.04) translate(8px, -6px);
+  }
+}
+
+@keyframes fiveos-breathe {
+  0%, 100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.01);
+  }
+}
+
+@keyframes fiveos-pulse-subtle {
+  0%, 100% {
+    box-shadow: var(--fiveos-shadow-md);
+  }
+  50% {
+    box-shadow: var(--fiveos-shadow-lg);
+  }
+}
+
+@keyframes fiveos-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.fiveos-animate-drift {
+  animation: fiveos-drift 18s ease-in-out infinite;
+}
+
+.fiveos-animate-breathe {
+  animation: fiveos-breathe 4s ease-in-out infinite;
+}
+
+.fiveos-animate-float {
+  animation: fiveos-float 6s ease-in-out infinite;
+}
+
+/* ========================================
+   7. TYPOGRAPHY (Ligera, espaciada)
+   ======================================== */
+
+.fiveos-text-display {
+  font-family: var(--fiveos-font-family);
+  font-weight: var(--fiveos-font-weight-light);
+  font-size: 48px;
+  letter-spacing: -0.5px;
+  line-height: var(--fiveos-line-height-tight);
+  color: var(--fiveos-text-primary);
+}
+
+.fiveos-text-title {
+  font-family: var(--fiveos-font-family);
+  font-weight: var(--fiveos-font-weight-semibold);
+  font-size: 28px;
+  letter-spacing: -0.3px;
+  line-height: var(--fiveos-line-height-tight);
+  color: var(--fiveos-text-primary);
+}
+
+.fiveos-text-heading {
+  font-family: var(--fiveos-font-family);
+  font-weight: var(--fiveos-font-weight-medium);
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: var(--fiveos-line-height-normal);
+  color: var(--fiveos-text-primary);
+}
+
+.fiveos-text-body {
+  font-family: var(--fiveos-font-family);
+  font-weight: var(--fiveos-font-weight-regular);
+  font-size: 15px;
+  letter-spacing: 0;
+  line-height: var(--fiveos-line-height-relaxed);
+  color: var(--fiveos-text-secondary);
+}
+
+.fiveos-text-caption {
+  font-family: var(--fiveos-font-family);
+  font-weight: var(--fiveos-font-weight-regular);
+  font-size: 12px;
+  letter-spacing: 0.1px;
+  line-height: var(--fiveos-line-height-normal);
+  color: var(--fiveos-text-muted);
+}
+
+.fiveos-text-label {
+  font-family: var(--fiveos-font-family);
+  font-weight: var(--fiveos-font-weight-light);
+  font-size: 11px;
+  letter-spacing: 0.2px;
+  line-height: 1.3;
+  color: var(--fiveos-text-secondary);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* ========================================
+   8. BACK NAVIGATION (iPhone style)
+   ======================================== */
+
+.fiveos-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--fiveos-accent-blue);
+  font-family: var(--fiveos-font-family);
+  font-size: 17px;
+  font-weight: var(--fiveos-font-weight-regular);
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity var(--fiveos-transition-fast);
+}
+
+.fiveos-back-link:hover {
+  opacity: 0.7;
+}
+
+.fiveos-back-link:active {
+  opacity: 0.5;
+}
+
+/* ========================================
+   9. BUTTONS (Volumétricos, no planos)
+   ======================================== */
+
+.fiveos-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fiveos-space-sm);
+  padding: var(--fiveos-space-sm) var(--fiveos-space-lg);
+  border-radius: var(--fiveos-radius-full);
+  font-family: var(--fiveos-font-family);
+  font-size: 15px;
+  font-weight: var(--fiveos-font-weight-medium);
+  cursor: pointer;
+  border: none;
+  transition: all var(--fiveos-transition-fast);
+}
+
+.fiveos-button-primary {
+  background: linear-gradient(
+    145deg,
+    var(--fiveos-accent-blue) 0%,
+    color-mix(in srgb, var(--fiveos-accent-blue) 85%, black) 100%
+  );
+  color: white;
+  box-shadow: 0 4px 14px rgba(0, 122, 255, 0.35);
+}
+
+.fiveos-button-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 122, 255, 0.45);
+}
+
+.fiveos-button-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.30);
+}
+
+.fiveos-button-glass {
+  background: var(--fiveos-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--fiveos-text-primary);
+  border: 1px solid var(--fiveos-stroke);
+}
+
+.fiveos-button-glass:hover {
+  background: var(--fiveos-glass-hover);
+}
+
+/* ========================================
+   10. LIST ITEMS (Flotantes, suaves)
+   ======================================== */
+
+.fiveos-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--fiveos-space-md);
+  padding: var(--fiveos-space-md);
+  background: var(--fiveos-surface);
+  border-radius: var(--fiveos-radius-md);
+  transition: background var(--fiveos-transition-fast);
+}
+
+.fiveos-list-item:hover {
+  background: var(--fiveos-surface-hover);
+}
+
+.fiveos-list-item:active {
+  background: var(--fiveos-surface-active);
+}
+
+/* ========================================
+   11. SCROLLBAR (Minimal)
+   ======================================== */
+
+.fiveos-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.fiveos-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.fiveos-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--fiveos-radius-full);
+}
+
+.fiveos-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ========================================
+   12. UTILITY CLASSES
+   ======================================== */
+
+.fiveos-no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.fiveos-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fiveos-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.fiveos-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+/* Micro-offsets for "tension controlada" */
+.fiveos-offset-1 { transform: translate(-1px, 1px); }
+.fiveos-offset-2 { transform: translate(1px, -1px); }
+.fiveos-offset-3 { transform: translate(-1px, 2px); }
+.fiveos-offset-4 { transform: translate(2px, -1px); }

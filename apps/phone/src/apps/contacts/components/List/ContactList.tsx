@@ -19,6 +19,21 @@ import { setClipboard } from "@os/phone/hooks";
 import { useSnackbar } from '@os/snackbar/hooks/useSnackbar';
 import fetchNui from "@utils/fetchNui";
 
+// Modern gradient palettes for avatar placeholders
+const AVATAR_GRADIENTS = [
+  'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // Purple
+  'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', // Pink/Coral
+  'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', // Blue/Cyan
+  'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', // Green/Mint
+  'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', // Pink/Yellow
+];
+
+// Get consistent gradient based on name hash
+const getAvatarGradient = (name: string): string => {
+  const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return AVATAR_GRADIENTS[hash % AVATAR_GRADIENTS.length];
+};
+
 export const ContactList: React.FC = () => {
   const filteredContacts = useFilteredContacts();
   const history = useHistory();
@@ -33,7 +48,7 @@ export const ContactList: React.FC = () => {
   }, []);
 
   const myNumber = useMyPhoneNumber()
-  const {avatar_url} = useTwitterProfileValue()
+  const { avatar_url } = useTwitterProfileValue()
 
   return (
     <div className="relative">
@@ -55,7 +70,7 @@ export const ContactList: React.FC = () => {
         <nav className="space-y-2 overflow-y-auto" aria-label="Directory">
           <div key="self" className="relative">
             <List>
-                <SelfContact key="self" number={myNumber} avatar={avatar_url} />
+              <SelfContact key="self" number={myNumber} avatar={avatar_url} />
             </List>
           </div>
 
@@ -83,9 +98,9 @@ interface ContactItemProps extends Contact {
   onClick?: () => void;
 }
 
-const SelfContact = ({number, avatar}: {number: string, avatar:string}) => {
+const SelfContact = ({ number, avatar }: { number: string, avatar: string }) => {
   const [t] = useTranslation();
-  const {addAlert} = useSnackbar()
+  const { addAlert } = useSnackbar()
   const copyNumber = () => {
     setClipboard(number);
     addAlert({
@@ -108,10 +123,16 @@ const SelfContact = ({number, avatar}: {number: string, avatar:string}) => {
         >
           <div className="flex items-center space-x-2">
             {avatar && avatar.length > 0 ? (
-              <img src={avatar} className="inline-block h-10 w-10 rounded-full" alt={'avatar'} />
+              <img src={avatar} className="inline-block h-10 w-10 rounded-full object-cover" alt={'avatar'} />
             ) : (
-              <div className="flex h-10 w-10 items-center justify-center rounded-full">
-                <span className="text-gray-600 dark:text-gray-300">Me</span>
+              <div
+                className="flex h-10 w-10 items-center justify-center rounded-full"
+                style={{
+                  background: getAvatarGradient('Me'),
+                  boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)'
+                }}
+              >
+                <span className="text-white font-semibold text-sm">Me</span>
               </div>
             )}
             <div>
@@ -122,7 +143,7 @@ const SelfContact = ({number, avatar}: {number: string, avatar:string}) => {
             </div>
           </div>
           <div className="space-x-3">
-            <Tooltip title={t('GENERIC.WRITE_TO_CLIPBOARD_TOOLTIP', {content: 'Number'}) as string}>
+            <Tooltip title={t('GENERIC.WRITE_TO_CLIPBOARD_TOOLTIP', { content: 'Number' }) as string}>
               <button
                 onClick={copyNumber}
                 className="rounded-full bg-neutral-100 p-3 text-neutral-300 hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-700"
@@ -197,10 +218,16 @@ const ContactItem = ({ number, avatar, id, display }: ContactItemProps) => {
         >
           <div className="flex items-center space-x-2">
             {avatar && avatar.length > 0 ? (
-              <img src={avatar} className="inline-block h-10 w-10 rounded-full" alt={'avatar'} />
+              <img src={avatar} className="inline-block h-10 w-10 rounded-full object-cover" alt={'avatar'} />
             ) : (
-              <div className="flex h-10 w-10 items-center justify-center rounded-full">
-                <span className="text-gray-600 dark:text-gray-300">{initials(display)}</span>
+              <div
+                className="flex h-10 w-10 items-center justify-center rounded-full"
+                style={{
+                  background: getAvatarGradient(display),
+                  boxShadow: '0 2px 8px rgba(102, 126, 234, 0.25)'
+                }}
+              >
+                <span className="text-white font-semibold text-sm">{initials(display)}</span>
               </div>
             )}
             <div>
